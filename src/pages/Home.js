@@ -1,69 +1,33 @@
 import { useEffect, useState } from 'react'
-import { ChakraProvider, Button, Flex, Heading } from "@chakra-ui/react"
-import  { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { Button, Flex, Input, Image, Box } from "@chakra-ui/react"
+import { useNavigate } from 'react-router-dom'
 
-import { app } from "../firebaseConfig"
 import useUser from '../hooks/useUser';
+import Header from '../components/Header';
 
 const Home = () => {
-    const [errorMessage, setErrorMessage] = useState(null);
-    const { user, setUser } = useUser();
+    const { user } = useUser();
+    const navigate = useNavigate();
 
-    const handleGoogleLogin = () => {
-        const provider = new GoogleAuthProvider();
-        const auth = getAuth(app);
-        signInWithPopup(auth, provider).then(
-            (userCredentials) => {
-                setUser(
-                    {
-                        name: userCredentials.user.displayName,
-                        profileImage: userCredentials.user.photoURL
-                    }
-                )
-            }
-        ).catch(
-            (error) => {
-                setErrorMessage(error.message);
-            }
-        )
+    const handleButton = () => {
+        if (!user.name) {
+            navigate("/login");
+        }
     }
-
-    useEffect(() => {
-        
-    }, [user])    
 
     return (
         <>
-            <header className = "container App-header">
-                <h1>Bienvenido/a a Lista de Tareas</h1>
-            </header>
-            <ChakraProvider>
-                <Flex flexWrap="wrap" justifyContent="center" h="30vh" w="auto" m={5}>
-                    <div className = "login">
-                        <Button colorScheme="teal" variant="solid" size="lg"
-                            backgroundColor="#282c34" onClick={handleGoogleLogin}>
-                            {user.name ? "Iniciar Sesión con otra cuenta de Google":"Iniciar Sesión con Google"}
-                        </Button>
-                        {user.name && (
-                            <Button colorScheme="teal" variant="outline" size="lg"
-                                borderColor="#282c34" onClick={() => {
-                                    window.localStorage.removeItem("user");
-                                    setUser({});
-                                }}>
-                                Cerrar sesión
-                            </Button>
-                        )}
-                        
-                    </div>
-                    {
-                        errorMessage && (
-                            <Heading as="h3" color="red.600">
-                                {errorMessage}
-                            </Heading>
-                        )
-                    }
-                </Flex>
-            </ChakraProvider>
+            <Header>Bienvenid@ a Pedidos App</Header>
+            <Flex flexWrap="wrap" justifyContent="center" h="100%" w="100%" 
+                alignItems="center" m={0} flexDirection="column" gap={0}
+                bgImage="https://i.blogs.es/fff4ca/pizzas/1366_2000.jpg">
+                <Input placeholder="Pizza, sushi, ..." w={{base: "80%", lg: "40%"}}
+                    backgroundColor="brand.0" bgImage="none" m={10} mb={0}/>
+                <Button backgroundColor="brand.2" color="brand.0" m={10}
+                    variant="solid" size="lg" onClick={handleButton}>
+                    Pedir
+                </Button>
+            </Flex>
         </>
     );
 }
